@@ -41,4 +41,30 @@ class DRV8870 {
         _valorDePotencia = 0;
     }
 
+    void setPotencia(int potencia) {
+        if (motorInvertido) {
+            potencia = -potencia;
+        }
+
+        if (potencia > 0) {
+            ledcWrite(_canalPino1, _valorMaximoDePotencia);
+            ledcWrite(_canalPino2, _valorMaximoDePotencia - potencia);
+        } 
+        
+        else if (potencia < 0) {
+            ledcWrite(_canalPino1, _valorMaximoDePotencia - abs(potencia));
+            ledcWrite(_canalPino2, _valorMaximoDePotencia);
+        } 
+        
+        else {
+            parar();
+        }
+
+        _valorDePotencia = potencia;
+    }
+
+    int getPotencia() {
+        return _valorDePotencia;
+    }
+
 };
