@@ -1,70 +1,63 @@
-#pragma once
+// Classe do driver de motor DRV8870
 
+#pragma once
 #include <Arduino.h>
 
 class DRV8870 {
     private:
-        int _pino1;
-        int _pino2;
+        int pinoIN1;
+        int pinoIN2;
+        int canalIN1;
+        int canalIN2;
 
-        int _canalPino1;
-        int _canalPino2;
-
-        int _valorMaximoDePotencia;
-
-        int _valorDePotencia = 0;
+        static constexpr int FREQUENCIA_PWM = 1000;
+        static constexpr int RESOLUCAO_PWM = 8;
+        static constexpr int POTENCIA_MAXIMA = (1 << RESOLUCAO_PWM) - 1;
+        int _potencia;
 
     public:
+        DRV8870(int _pinoIN1, int _pinoIN2, int _canalIN1, int _canalIN2) : pinoIN1(_pinoIN1), pinoIN2(_pinoIN2), canalIN1(_canalIN1), canalIN2(_canalIN2) {
+            ledcAttachPin(pinoIN1, canalIN1);
+            ledcAttachPin(pinoIN2, canalIN2);
 
-        bool motorInvertido = false;
-        
-
-    DRV8870(int pino1, int pino2, int canalPino1, int canalPino2, int frequenciaPWM, int resolucaoPWM):
-        _pino1(pino1),
-        _pino2(pino2),
-        _canalPino1(canalPino1),
-        _canalPino2(canalPino2),
-
-        _valorMaximoDePotencia(pow(2, resolucaoPWM) - 1)
-    {
-        ledcSetup(_canalPino1, frequenciaPWM, resolucaoPWM);
-        ledcSetup(_canalPino2, frequenciaPWM, resolucaoPWM);
-
-        ledcAttachPin(_pino1, _canalPino1);
-        ledcAttachPin(_pino2, _canalPino2);
-    }
-
-    void parar() {
-        ledcWrite(_canalPino1, _valorMaximoDePotencia);
-        ledcWrite(_canalPino2, _valorMaximoDePotencia);
-
-        _valorDePotencia = 0;
-    }
-
-    void setPotencia(int potencia) {
-        if (motorInvertido) {
-            potencia = -potencia;
+            ledcSetup(canalIN1, FREQUENCIA_PWM, RESOLUCAO_PWM);
+            ledcSetup(canalIN2, FREQUENCIA_PWM, RESOLUCAO_PWM);
         }
 
-        if (potencia > 0) {
-            ledcWrite(_canalPino1, _valorMaximoDePotencia);
-            ledcWrite(_canalPino2, _valorMaximoDePotencia - potencia);
-        } 
-        
-        else if (potencia < 0) {
-            ledcWrite(_canalPino1, _valorMaximoDePotencia - abs(potencia));
-            ledcWrite(_canalPino2, _valorMaximoDePotencia);
-        } 
-        
-        else {
-            parar();
+        void setVelocidade(int potencia) {
+            potencia = constrain(potencia, -POTENCIA_MAXIMA, POTENCIA_MAXIMA);
+
+            if (potencia > 0) {
+                ledcWrite(canalIN1, potencia);
+                ledcWrite(canalIN2, 0);
+            } 
+            
+            else if (potencia < 0) {
+                ledcWrite(canalIN1, 0);
+                ledcWrite(canalIN2, abs(potencia));
+            } 
+            
+            else {
+                ledcWrite(canalIN1, 0);
+                ledcWrite(canalIN2, 0);
+            }
+
+            _potencia = potencia;
         }
 
-        _valorDePotencia = potencia;
-    }
+        void parar(bool freio = true) {
+            if (freio) {
+                ledcWrite(canalIN1, POTENCIA_MAXIMA);
+                ledcWrite(canalIN2, POTENCIA_MAXIMA);
+            }
 
-    int getPotencia() {
-        return _valorDePotencia;
-    }
+            else {
+                ledcWrite(canalIN1, 0);
+                ledcWrite(canalIN2, 0);
+            }
+        }
 
+        int getPotencia() {
+            return _potencia;
+        }
 };
