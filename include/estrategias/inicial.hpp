@@ -19,4 +19,13 @@ class EstrategiaInicial {
                 return;
             }
         }
+
+        void giro45Graus() {
+            motorEsquerdo.setVelocidade(motorEsquerdo.getPotenciaMaxima());
+            motorDireito.setVelocidade(-motorDireito.getPotenciaMaxima());
+
+            if (delayEstrategia(tempoGiro45Graus)) {
+                return;
+            }
+        }
 };
