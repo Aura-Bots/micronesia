@@ -60,4 +60,8 @@ class DRV8870 {
         int getPotencia() {
             return _potencia;
         }
+
+        int getPotenciaMaxima() {
+            return POTENCIA_MAXIMA;
+        }
 };
