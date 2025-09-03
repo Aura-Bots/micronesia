@@ -5,15 +5,15 @@
 
 class DRV8870 {
     private:
-        int pinoIN1;
-        int pinoIN2;
-        int canalIN1;
-        int canalIN2;
+        uint8_t pinoIN1;
+        uint8_t pinoIN2;
+        uint8_t canalIN1;
+        uint8_t canalIN2;
 
         static constexpr int FREQUENCIA_PWM = 1000;
         static constexpr int RESOLUCAO_PWM = 8;
         static constexpr int POTENCIA_MAXIMA = (1 << RESOLUCAO_PWM) - 1;
-        int _potencia;
+        short int _potencia;
 
     public:
         DRV8870(int _pinoIN1, int _pinoIN2, int _canalIN1, int _canalIN2) : pinoIN1(_pinoIN1), pinoIN2(_pinoIN2), canalIN1(_canalIN1), canalIN2(_canalIN2) {
