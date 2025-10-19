@@ -10,13 +10,17 @@ class DRV8870 {
         uint8_t canalIN1;
         uint8_t canalIN2;
 
-        static constexpr int FREQUENCIA_PWM = 1000;
-        static constexpr int RESOLUCAO_PWM = 8;
+        static constexpr int FREQUENCIA_PWM = 20000;
+        static constexpr int RESOLUCAO_PWM = 12;
         static constexpr int POTENCIA_MAXIMA = (1 << RESOLUCAO_PWM) - 1;
-        short int _potencia;
+        int _potencia;
 
     public:
-        DRV8870(int _pinoIN1, int _pinoIN2, int _canalIN1, int _canalIN2) : pinoIN1(_pinoIN1), pinoIN2(_pinoIN2), canalIN1(_canalIN1), canalIN2(_canalIN2) {
+        DRV8870(uint8_t _pinoIN1, uint8_t _pinoIN2, uint8_t _canalIN1, uint8_t _canalIN2) 
+                : pinoIN1(_pinoIN1), pinoIN2(_pinoIN2), canalIN1(_canalIN1), canalIN2(_canalIN2) {
+        }
+
+        void initDriver() {
             ledcAttachPin(pinoIN1, canalIN1);
             ledcAttachPin(pinoIN2, canalIN2);
 
@@ -38,8 +42,7 @@ class DRV8870 {
             } 
             
             else {
-                ledcWrite(canalIN1, 0);
-                ledcWrite(canalIN2, 0);
+                parar(false);
             }
 
             _potencia = potencia;
@@ -55,13 +58,15 @@ class DRV8870 {
                 ledcWrite(canalIN1, 0);
                 ledcWrite(canalIN2, 0);
             }
+
+            _potencia = 0;
         }
 
-        int getPotencia() {
+        int getPotencia() const {
             return _potencia;
         }
 
-        int getPotenciaMaxima() {
+        static int getPotenciaMaxima() {
             return POTENCIA_MAXIMA;
         }
 };
