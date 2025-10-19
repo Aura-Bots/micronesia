@@ -6,27 +6,24 @@
 void setup() {
     initBLE();
 
+    motorDireito.initDriver();
+    motorEsquerdo.initDriver();
+
     pinMode(PINO_LED, OUTPUT);
     pinMode(PINO_MOD_START, INPUT);
 }
 
 void loop() {
-    BLE.pool()
+    BLE.pool();
 
-    if (leituraModStart == HIGH) {
-        digitalWrite(PINO_LED, HIGH);
+    switch (leituraModStart) {
+        case HIGH:
+            digitalWrite(PINO_LED, HIGH);
 
-        if (estadoAtual == ESTRATEGIA_INICIAL_PRIMARIA) {
-            executarEstragiaInicial();
-            
-        }
-        
-        
-    }
-
-    else {
-        digitalWrite(PINO_LED, LOW);
-        motorDireito.parar();
-        motorEsquerdo.parar();
+        case LOW:
+            digitalWrite(PINO_LED, LOW);
+            motorDireito.parar();
+            motorEsquerdo.parar();
+            break;
     }
 }
