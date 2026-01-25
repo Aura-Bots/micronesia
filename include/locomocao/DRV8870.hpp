@@ -5,13 +5,14 @@
 
 class DRV8870 {
     private:
-        uint8_t pinoIN1;
-        uint8_t pinoIN2;
-        uint8_t canalIN1;
-        uint8_t canalIN2;
+        const uint8_t pinoIN1;
+        const uint8_t pinoIN2;
+        const uint8_t canalIN1;
+        const uint8_t canalIN2;
+        bool invertido = false;
 
-        static constexpr int FREQUENCIA_PWM = 20000;
-        static constexpr int RESOLUCAO_PWM = 12;
+        static constexpr uint32_t FREQUENCIA_PWM = 20000;
+        static constexpr uint8_t RESOLUCAO_PWM = 12;
         static constexpr int POTENCIA_MAXIMA = (1 << RESOLUCAO_PWM) - 1;
         static constexpr int POTENCIA_MINIMA = -POTENCIA_MAXIMA;
         static constexpr uint8_t POTENCIA_NEUTRA = 0;
@@ -29,8 +30,16 @@ class DRV8870 {
             parar(false);
         }
 
+        void setInversao(bool invert) {
+            invertido = invert;
+        }
+
         void setVelocidade(int potencia) {
             potencia = constrain(potencia, POTENCIA_MINIMA, POTENCIA_MAXIMA);
+
+            if (invertido) {
+                potencia = -potencia;
+            }
 
             if (potencia > POTENCIA_NEUTRA) {
                 ledcWrite(canalIN1, potencia);
@@ -67,7 +76,7 @@ class DRV8870 {
             return _potencia;
         }
 
-        static constexpr int getPotenciaMaxima() {
+        constexpr int getPotenciaMaxima() const {
             return POTENCIA_MAXIMA;
         }
 };
